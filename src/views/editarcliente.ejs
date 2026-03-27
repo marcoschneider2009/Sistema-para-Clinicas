@@ -1,0 +1,106 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="content-wrapper">
+    <div class="page-header" style="margin-bottom: 30px;">
+        <h1><i class="fas fa-user-edit"></i> Alterar Dados do Paciente</h1>
+        <p>Editando registro de: <strong><%= cliente.nome %></strong></p>
+    </div>
+
+    <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); max-width: 900px; margin: 0 auto;">
+        
+        <form action="/clientes/atualizar/<%= cliente.id %>" method="POST" enctype="multipart/form-data">
+            
+            <div style="display: flex; gap: 30px; margin-bottom: 25px; align-items: flex-start; border-bottom: 1px solid #f1f5f9; padding-bottom: 20px;">
+                
+                <div style="text-align: center;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: bold;">Foto de Perfil</label>
+                    <img src="/uploads/clientes/<%= cliente.foto || 'default-avatar.png' %>" 
+                         style="width: 150px; height: 150px; border-radius: 12px; object-fit: cover; border: 3px solid #f1f5f9; margin-bottom: 10px;">
+                    <input type="file" name="foto" accept="image/*" style="font-size: 0.7rem; width: 150px;">
+                </div>
+
+                <div style="flex: 1;">
+                    <div style="margin-bottom: 15px;">
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nome Completo</label>
+                        <input type="text" name="nome" value="<%= cliente.nome %>" required 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+
+                    <div style="display: flex; gap: 15px; margin-bottom: 15px;">
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">CPF</label>
+                            <input type="text" name="cpf" value="<%= cliente.cpf %>" 
+                                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Nascimento</label>
+                            <input type="date" name="data_nascimento" value="<%= cliente.data_nascimento %>" 
+                                   style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="display: block; margin-bottom: 5px; font-weight: bold;">Telefone de Contato</label>
+                        <input type="text" name="telefone" value="<%= cliente.telefone %>" 
+                               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <label style="display: block; margin-bottom: 10px; font-weight: bold; color: #1e293b;">
+                    <i class="fas fa-notes-medical"></i> Histórico / Evolução do Paciente
+                </label>
+                <textarea name="historico" rows="6" 
+                          style="width: 100%; padding: 15px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: inherit; line-height: 1.5; background: #f8fafc;"><%= cliente.historico %></textarea>
+            </div>
+
+            <div style="margin-top: 30px; background: #f1f5f9; padding: 20px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                <h3 style="margin-bottom: 15px; color: #1e293b; font-size: 1.1rem;">
+                    <i class="fas fa-x-ray"></i> Galeria de Exames (RX e Procedimentos)
+                </h3>
+
+                <div style="margin-bottom: 20px; padding: 15px; background: white; border: 2px dashed #cbd5e1; text-align: center; border-radius: 6px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Anexar Novos Exames</label>
+                    <input type="file" name="exames" multiple accept="image/*" style="font-size: 0.9rem;">
+                    <p style="font-size: 0.75rem; color: #64748b; margin-top: 5px;">Selecione várias imagens de uma só vez (RX, Ultrassom, etc).</p>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 15px;">
+                    <% if (typeof exames !== 'undefined' && exames.length > 0) { %>
+                        <% exames.forEach(exame => { %>
+                            <div style="text-align: center; background: white; padding: 5px; border-radius: 4px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                                <img src="/uploads/exames/<%= exame.arquivo %>" 
+                                     style="width: 100%; height: 100px; object-fit: cover; border-radius: 3px;">
+                                <small style="display: block; font-size: 10px; margin-top: 5px; color: #475569;"><%= exame.tipo || 'Exame' %></small>
+                            </div>
+                        <% }) %>
+                    <% } else { %>
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 20px; color: #94a3b8;">
+                            <i class="fas fa-images" style="font-size: 2rem; display: block; margin-bottom: 10px;"></i>
+                            <p style="font-style: italic; font-size: 0.9rem;">Nenhuma radiografia ou exame anexado para este paciente.</p>
+                        </div>
+                    <% } %>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 15px; align-items: center;">
+                <button type="submit" style="flex: 2; background: #1e293b; color: white; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem;">
+                    <i class="fas fa-sync-alt"></i> Salvar Alterações
+                </button>
+
+                <a href="/clientes/relatorio/<%= cliente.id %>" target="_blank" 
+                   style="flex: 1; background: #059669; color: white; padding: 14px; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold; font-size: 0.9rem;">
+                    <i class="fas fa-file-pdf"></i> Gerar Relatório
+                </a>
+
+                <a href="/clientes" style="flex: 1; background: #f1f5f9; color: #475569; padding: 14px; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold;">
+                    Voltar
+                </a>
+            </div>
+        </form>
+    </div>
+</main>
+
+<%- include('partials/footer') %>

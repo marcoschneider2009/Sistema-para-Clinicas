@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Relatório Clínico - <%= cliente.nome %></title>
+    <style>
+        body { font-family: sans-serif; padding: 40px; color: #333; background-color: #fff; }
+        .header { text-align: center; border-bottom: 2px solid #38bdf8; padding-bottom: 20px; margin-bottom: 30px; }
+        .paciente-info { display: flex; gap: 25px; align-items: center; margin-bottom: 30px; }
+        .foto-perfil { width: 120px; height: 120px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd; }
+        .info-texto h2 { margin: 0 0 10px 0; color: #1e293b; text-transform: uppercase; }
+        .info-texto p { margin: 5px 0; color: #475569; }
+        
+        h3 { border-left: 4px solid #38bdf8; padding-left: 10px; margin-top: 40px; color: #0f172a; }
+        
+        .historico { 
+            margin-top: 15px; 
+            white-space: pre-wrap; 
+            line-height: 1.6; 
+            border: 1px solid #e2e8f0; 
+            padding: 20px; 
+            background-color: #f8fafc;
+            border-radius: 4px;
+        }
+        
+        .galeria-exames { 
+            margin-top: 20px; 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 20px; 
+        }
+        
+        .exame-item { 
+            width: 280px; 
+            border: 1px solid #e2e8f0; 
+            padding: 10px; 
+            background: #fff;
+            border-radius: 6px;
+            text-align: center;
+        }
+        
+        .exame-item img { width: 100%; height: auto; border-radius: 4px; display: block; }
+        .exame-item p { font-size: 11px; color: #64748b; margin-top: 8px; font-weight: bold; }
+        
+        .assinatura { 
+            margin-top: 80px; 
+            text-align: center; 
+            border-top: 1px solid #333; 
+            width: 350px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            padding-top: 10px;
+        }
+
+        @media print { 
+            .no-print { display: none; } 
+            body { padding: 0; }
+            .exame-item { page-break-inside: avoid; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="no-print" style="text-align: right; margin-bottom: 20px;">
+        <button onclick="window.print()" style="padding: 10px 20px; cursor: pointer; background: #10b981; color: white; border: none; border-radius: 4px; font-weight: bold;">
+            <i class="fas fa-print"></i> Imprimir Relatório
+        </button>
+        <a href="/clientes/editar/<%= cliente.id %>" style="padding: 10px 20px; text-decoration: none; background: #64748b; color: white; border-radius: 4px; font-size: 14px; margin-left: 10px;">Voltar</a>
+    </div>
+
+    <div class="header">
+        <h1>AURA CLINIC - SISTEMA DE GESTÃO</h1>
+        <p>Relatório de Evolução Clínica e Diagnóstico por Imagem</p>
+    </div>
+
+    <div class="paciente-info">
+        <img src="/uploads/clientes/<%= cliente.foto || 'default-avatar.png' %>" class="foto-perfil">
+        <div class="info-texto">
+            <h2><%= cliente.nome %></h2>
+            <p><strong>CPF:</strong> <%= cliente.cpf %> | <strong>Nascimento:</strong> <%= cliente.data_nascimento %></p>
+            <p><strong>Telefone:</strong> <%= cliente.telefone %></p>
+        </div>
+    </div>
+
+    <h3>Histórico Clínico Detalhado</h3>
+    <div class="historico"><%= cliente.historico || 'Nenhum registro encontrado no prontuário.' %></div>
+
+    <h3>Anexos (Radiografias e Procedimentos)</h3>
+    <div class="galeria-exames">
+        <% if (exames && exames.length > 0) { %>
+            <% exames.forEach(exame => { %>
+                <div class="exame-item">
+                    <img src="/uploads/clientes/<%= exame.arquivo %>" alt="RX / Exame">
+                    <p>ANEXO: <%= exame.tipo || 'Imagiologia Clínica' %></p>
+                </div>
+            <% }) %>
+        <% } else { %>
+            <p style="color: #94a3b8; font-style: italic;">Nenhuma imagem de exame anexada a este prontuário.</p>
+        <% } %>
+    </div>
+
+    <div class="assinatura">
+        <p>Assinatura do Profissional Responsável</p>
+        <p style="font-size: 10px; color: #94a3b8;">Gerado em: <%= new Date().toLocaleDateString('pt-BR') %></p>
+    </div>
+
+    <script>
+        // Dispara a impressão automaticamente ao carregar a página
+        window.onload = function() { 
+            setTimeout(() => { window.print(); }, 500); 
+        };
+    </script>
+</body>
+</html>

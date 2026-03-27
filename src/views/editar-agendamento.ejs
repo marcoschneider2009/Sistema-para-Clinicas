@@ -1,0 +1,144 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<style>
+    /* Estilos para expandir a tabela e dar respiro ao layout */
+    .aura-table {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 8px; /* Espaço entre as linhas */
+        margin-top: 20px;
+    }
+
+    .aura-table th {
+        padding: 15px 20px;
+        color: #64748b;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 1px;
+    }
+
+    .aura-table tbody tr {
+        background-color: white;
+        transition: all 0.3s ease;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+    }
+
+    .aura-table tbody tr:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    .aura-table td {
+        padding: 20px; /* Aumenta o espaço interno das células */
+        vertical-align: middle;
+        border: none;
+    }
+
+    .aura-table td:first-child { border-radius: 10px 0 0 10px; }
+    .aura-table td:last-child { border-radius: 0 10px 10px 0; }
+
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 11px;
+        font-weight: 700;
+        color: white;
+        display: inline-block;
+    }
+</style>
+
+<main class="content-wrapper" style="padding: 40px;">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
+        <div>
+            <h1 style="color: #1e293b;"><i class="fas fa-calendar-check me-2"></i> Gestão de Agendamentos</h1>
+            <p style="color: #64748b;">Visualize e gerencie a grade de atendimentos da clínica.</p>
+        </div>
+        <button class="btn-salvar" onclick="abrirModalCadastro()" style="background: #3b82f6; color: white; padding: 14px 28px; border-radius: 8px; cursor: pointer; border: none; font-weight: bold; transition: 0.3s;">
+            <i class="fas fa-plus me-2"></i> Novo Agendamento
+        </button>
+    </div>
+
+    <div class="table-responsive">
+        <table class="aura-table">
+            <thead>
+                <tr>
+                    <th>Paciente</th>
+                    <th>Data</th>
+                    <th>Hora</th>
+                    <th>Procedimento</th>
+                    <th>Status</th>
+                    <th style="text-align: center;">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (agendamentos && agendamentos.length > 0) { %>
+                    <% agendamentos.forEach(agendamento => { %>
+                        <tr>
+                            <td>
+                                <div style="display: flex; align-items: center;">
+                                    <div style="width: 35px; height: 35px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 12px; color: #64748b;">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <strong><%= agendamento.paciente_nome.toUpperCase() %></strong>
+                                </div>
+                            </td>
+                            <td style="font-weight: bold; color: #3b82f6;"><%= agendamento.data_br || agendamento.data %></td>
+                            <td style="color: #64748b;"><i class="far fa-clock me-1"></i> <%= agendamento.hora %></td>
+                            <td><span style="color: #475569;"><%= agendamento.procedimento %></span></td>
+                            <td>
+                                <% 
+                                    let badgeColor = "#3b82f6"; // Agendado
+                                    if(agendamento.status === 'Confirmado') badgeColor = "#10b981";
+                                    if(agendamento.status === 'Pendente') badgeColor = "#f59e0b";
+                                    if(agendamento.status === 'Cancelado') badgeColor = "#ef4444";
+                                %>
+                                <span class="status-badge" style="background: <%= badgeColor %>;">
+                                    <%= agendamento.status.toUpperCase() %>
+                                </span>
+                            </td>
+                            <td style="text-align: center;">
+                                <a href="/agendamentos/editar/<%= agendamento.id %>" style="color: #3b82f6; margin-right: 20px; font-size: 18px;"><i class="fas fa-edit"></i></a>
+                                <a href="javascript:void(0)" onclick="abrirModalExcluir('<%= agendamento.id %>', '<%= agendamento.paciente_nome %>')" style="color: #ef4444; font-size: 18px;"><i class="fas fa-trash"></i></a>
+                            </td>
+                        </tr>
+                    <% }) %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 80px; color: #94a3b8;">
+                            <i class="fas fa-calendar-times" style="font-size: 40px; display: block; margin-bottom: 10px;"></i>
+                            Nenhum agendamento encontrado para este período.
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<div id="modalExcluir" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center; backdrop-filter: blur(4px);">
+    <div style="background: white; padding: 40px; border-radius: 15px; width: 450px; text-align: center; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.1);">
+        <i class="fas fa-exclamation-circle" style="font-size: 50px; color: #ef4444; margin-bottom: 20px;"></i>
+        <h3 style="margin: 0 0 10px; color: #1e293b;">Confirmar Exclusão</h3>
+        <p id="textoConfirmacao" style="margin: 0; color: #64748b; font-size: 15px;"></p>
+        <form id="formExcluir" method="POST">
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button type="submit" style="flex: 1; background: #ef4444; color: white; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Sim, Excluir</button>
+                <button type="button" onclick="fecharModalExcluir()" style="flex: 1; background: #f1f5f9; color: #475569; padding: 14px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function abrirModalExcluir(id, nome) {
+        document.getElementById('modalExcluir').style.display = 'flex';
+        document.getElementById('textoConfirmacao').innerHTML = `Você tem certeza que deseja remover o agendamento de <br><strong>${nome}</strong>? Esta ação não pode ser desfeita.`;
+        document.getElementById('formExcluir').action = `/agendamentos/deletar/${id}`;
+    }
+    function fecharModalExcluir() { document.getElementById('modalExcluir').style.display = 'none'; }
+    function abrirModalCadastro() { window.location.href = '/agendamentos/novo'; }
+</script>
+
+<%- include('partials/footer') %>
+

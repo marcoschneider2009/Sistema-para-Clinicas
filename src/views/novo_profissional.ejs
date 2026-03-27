@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="content-wrapper" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+        <div>
+            <h1 style="margin: 0; font-size: 24px; color: #1e293b;"><i class="fas fa-user-plus"></i> Novo Profissional</h1>
+            <p style="margin: 0; color: #64748b;">Cadastre um novo membro na equipe Aura.</p>
+        </div>
+        <a href="/profissionais" style="background: #f1f5f9; color: #475569; padding: 10px 20px; border-radius: 6px; text-decoration: none; font-weight: bold; border: 1px solid #e2e8f0;">
+            <i class="fas fa-times"></i> Cancelar
+        </a>
+    </div>
+
+    <form action="/profissionais/novo" method="POST" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start;">
+            
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;">
+                <div style="width: 140px; height: 140px; border-radius: 50%; background: #f8fafc; border: 2px dashed #cbd5e1; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fas fa-camera" style="font-size: 40px; color: #94a3b8;"></i>
+                </div>
+                <label style="display: block; font-weight: bold; font-size: 13px; color: #64748b; margin-bottom: 10px;">Foto do Profissional</label>
+                <input type="file" name="foto" accept="image/*" style="font-size: 11px; width: 100%;">
+            </div>
+
+            <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 20px;">
+                
+                <div>
+                    <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 8px; color: #334155;">Nome Completo</label>
+                    <input type="text" name="nome" placeholder="Digite o nome do profissional" required 
+                           style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 8px; color: #334155;">Especialidade</label>
+                        <input type="text" name="especialidade" placeholder="Ex: Dentista" required 
+                               style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 8px; color: #334155;">Registro (CRO/CRM)</label>
+                        <input type="text" name="registro" placeholder="00000" required 
+                               style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 8px; color: #334155;">Telefone</label>
+                        <input type="text" name="telefone" placeholder="(00) 00000-0000" 
+                               style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>
+                </div>
+
+                <div style="margin-top: 10px; padding-top: 20px; border-top: 1px solid #f1f5f9;">
+                    <button type="submit" style="width: 100%; background: #1e293b; color: white; padding: 14px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 16px;">
+                        <i class="fas fa-check-circle"></i> Salvar Profissional
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<%- include('partials/footer') %>

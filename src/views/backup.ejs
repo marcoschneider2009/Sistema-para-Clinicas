@@ -1,0 +1,24 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="conteudo-principal">
+    <header>
+        <h1>Gestão de Backup </h1> </header>
+    
+    
+    <section class="cards-status">
+        <div class="card">
+            <h3><%= dados.status %></h3>
+            <p>Operando normalmente</p>
+            <small>Responsável: <%= dados.usuario %></small>
+        </div>
+    <section>
+        
+    </section>    
+        <div class="card">
+            <h3><%= dados.status %></h3>
+            <p>Operando</p>
+            <small>Responsável: <%= dados.usuario %></small>
+        </div>
+    </section>
+</main>

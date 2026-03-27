@@ -1,0 +1,85 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="content-wrapper" style="padding: 20px; background: #f0f2f5; min-height: 100vh; font-family: 'Segoe UI', sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <h1 style="color: #3d4451; margin: 0; font-size: 24px; font-weight: 800;">Aura System <span style="font-weight: 300;">| Clínica</span></h1>
+            <p style="color: #64748b; margin: 3px 0 0; font-size: 14px;">
+                Gestão Operacional: <span style="color: #3b82f6; font-weight: bold;"><%= dataHoje %></span> 
+                <span style="color: #f59e0b; font-weight: bold; text-transform: uppercase; margin-left: 12px; font-size: 12px;"><i class="fas fa-clock"></i> <%= turno %></span>
+            </p>
+        </div>
+        
+        <div style="background: white; padding: 8px 18px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); border-right: 5px solid #10b981; display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 12px; font-weight: bold; color: #3d4451;">IA Online</span>
+            <i class="fas fa-robot" style="color: #10b981; font-size: 16px;"></i>
+        </div>
+    </div>
+
+    <div style="background: white; border-radius: 15px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e2e8f0;">
+        
+        <div style="display: grid; grid-template-columns: 90px repeat(<%= profissionais.length %>, 1fr); background: #ffffff; border-bottom: 3px solid #3d4451;">
+            <div style="border-right: 1px solid #e2e8f0; background: #f8fafc; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #3d4451; font-size: 12px;">HORA</div>
+            
+            <% profissionais.forEach(prof => { %>
+                <div style="padding: 15px 10px; text-align: center; border-left: 1px solid #e2e8f0; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    
+                    <div style="width: 55px; height: 55px; border-radius: 50%; overflow: hidden; border: 3px solid #3b82f6; box-shadow: 0 3px 8px rgba(59, 130, 246, 0.2); margin-bottom: 8px;">
+                        <% if (prof.foto) { %>
+                            <img src="/uploads/profissionais/<%= prof.foto %>" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://ui-avatars.com/api/?name=<%= prof.nome %>&background=3d4451&color=fff'">
+                        <% } else { %>
+                            <img src="https://ui-avatars.com/api/?name=<%= prof.nome %>&background=3d4451&color=fff" style="width: 100%; height: 100%; object-fit: cover;">
+                        <% } %>
+                    </div>
+
+                    <div style="font-weight: 800; font-size: 12px; color: #1e293b; text-transform: uppercase; line-height: 1.2; min-height: 30px; display: flex; align-items: center; justify-content: center;">
+                        <%= prof.nome %>
+                    </div>
+                    <span style="font-size: 8px; color: #94a3b8; font-weight: 700; margin-top: 2px;">PROFISSIONAL</span>
+                </div>
+            <% }) %>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 90px repeat(<%= profissionais.length %>, 1fr);">
+            <% gradeHorarios.forEach(hora => { %>
+                <div style="padding: 20px 5px; border-bottom: 1px solid #f1f5f9; background: #f8fafc; font-weight: 800; color: #475569; font-size: 12px; text-align: center; border-right: 2px solid #e2e8f0; display: flex; align-items: center; justify-content: center;">
+                    <%= hora %>
+                </div>
+
+                <% profissionais.forEach(prof => { %>
+                    <div style="padding: 6px; border-bottom: 1px solid #f1f5f9; border-left: 1px solid #f1f5f9; min-height: 75px; display: flex; align-items: stretch;">
+                        <% 
+                            const consulta = agendamentos.find(a => {
+                                // Verifica match por ID ou por Nome caso o ID não esteja vinculado
+                                const profMatch = String(a.profissional_id) === String(prof.id) || String(a.profissional_id).trim() === String(prof.nome).trim();
+                                const horaMatch = String(a.hora).substring(0,5) === String(hora).trim();
+                                return profMatch && horaMatch;
+                            });
+
+                            if (consulta) { 
+                                // Lógica de cores baseada no Status
+                                let corCard = "#3b82f6"; // Azul (Agendado)
+                                if(consulta.status === 'Confirmado') corCard = "#10b981"; // Verde
+                                if(consulta.status === 'Pendente') corCard = "#f59e0b"; // Laranja
+                                if(consulta.status === 'Cancelado') corCard = "#ef4444"; // Vermelho
+                        %>
+                            <div onclick="window.location.href='/agendamentos/editar/<%= consulta.id %>'"
+                                 style="background: <%= corCard %>; color: white; padding: 8px 10px; border-radius: 8px; width: 100%; cursor: pointer; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; transition: transform 0.2s;">
+                                <div style="font-weight: 900; font-size: 11px; text-transform: uppercase; margin-bottom: 3px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <%= consulta.paciente_nome %>
+                                </div>
+                                <div style="font-size: 9px; opacity: 0.95; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                                    <i class="fas fa-notes-medical" style="font-size: 10px; margin-right: 3px;"></i> <%= consulta.procedimento || 'Procedimento' %>
+                                </div>
+                            </div>
+                        <% } %>
+                    </div>
+                <% }) %>
+            <% }) %>
+        </div>
+    </div>
+</main>
+
+<%- include('partials/footer') %>

@@ -1,0 +1,114 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="content-wrapper" style="padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <div>
+            <h1 style="margin: 0; font-size: 24px;"><i class="fas fa-user-edit"></i> Alterar Dados do Paciente</h1>
+            <p style="margin: 0; color: #64748b;">Editando: <strong><%= cliente.nome %></strong></p>
+        </div>
+        <a href="/clientes/relatorio/<%= cliente.id %>" target="_blank" 
+           style="background: #10b981; color: white; padding: 8px 16px; border-radius: 6px; text-decoration: none; font-weight: bold; font-size: 13px;">
+            <i class="fas fa-file-pdf"></i> Gerar Relatório (PDF)
+        </a>
+    </div>
+
+    <form action="/clientes/atualizar/<%= cliente.id %>" method="POST" enctype="multipart/form-data">
+        <div style="display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start;">
+            
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); text-align: center;">
+                    <img src="/uploads/clientes/<%= cliente.foto || 'default-avatar.png' %>" 
+                         style="width: 140px; height: 140px; border-radius: 50%; object-fit: cover; border: 3px solid #e2e8f0; margin-bottom: 10px;">
+                    <label style="display: block; font-weight: bold; font-size: 12px; color: #64748b; margin-bottom: 5px;">Trocar Foto</label>
+                    <input type="file" name="foto" accept="image/*" style="font-size: 11px; width: 100%;">
+                    <input type="hidden" name="foto_atual" value="<%= cliente.foto %>">
+                </div>
+
+                <div style="background: white; padding: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px dashed #cbd5e1;">
+                    <h3 style="font-size: 14px; margin-top: 0;"><i class="fas fa-images"></i> Galeria de Exames</h3>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin-bottom: 15px; max-height: 200px; overflow-y: auto;">
+                        <% if (exames && exames.length > 0) { %>
+                            <% exames.forEach(exame => { %>
+                                <div style="position: relative; border: 1px solid #e2e8f0; padding: 3px; border-radius: 4px;">
+                                    <button type="button" onclick="confirmarExclusaoExame('<%= cliente.id %>', '<%= exame.id %>')"
+                                            style="position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; border: none; border-radius: 50%; width: 18px; height: 18px; cursor: pointer; font-size: 10px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <img src="/uploads/clientes/<%= exame.arquivo %>" style="width: 100%; height: 60px; object-fit: cover; border-radius: 2px;">
+                                </div>
+                            <% }) %>
+                        <% } %>
+                    </div>
+                    <input type="file" name="exames" multiple style="font-size: 11px; width: 100%;">
+                </div>
+            </div>
+
+            <div style="background: white; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); display: flex; flex-direction: column; gap: 15px;">
+                
+                <div>
+                    <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Nome Completo</label>
+                    <input type="text" name="nome" value="<%= cliente.nome %>" required 
+                           style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                    <div>
+                        <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">CPF</label>
+                        <input type="text" name="cpf" value="<%= cliente.cpf %>" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Nascimento</label>
+                        <input type="date" name="data_nascimento" value="<%= cliente.data_nascimento %>" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>
+                    <div>
+                        <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;">Telefone / WhatsApp</label>
+                        <input type="text" name="telefone" value="<%= cliente.telefone %>" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px;">
+                    </div>
+                </div>
+
+                <div>
+                    <label style="display: block; font-weight: bold; font-size: 13px; margin-bottom: 5px;"><i class="fas fa-notes-medical"></i> Histórico Clínico</label>
+                    <textarea name="historico" rows="5" 
+                              style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 6px; font-family: inherit; resize: vertical;"><%= cliente.historico %></textarea>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button type="submit" style="flex: 2; background: #1e293b; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                        <i class="fas fa-save"></i> Salvar Alterações
+                    </button>
+                    <a href="/clientes" style="flex: 1; background: #f1f5f9; color: #475569; padding: 12px; border-radius: 6px; text-align: center; text-decoration: none; font-weight: bold; border: 1px solid #e2e8f0;">
+                        Voltar
+                    </a>
+                </div>
+            </div>
+        </div>
+    </form>
+</main>
+
+<form id="formExcluirExame" method="POST" style="display: none;"></form>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+function confirmarExclusaoExame(clienteId, exameId) {
+    Swal.fire({
+        title: 'Excluir Imagem?',
+        text: "Esta ação não pode ser desfeita.",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ef4444',
+        cancelButtonColor: '#94a3b8',
+        confirmButtonText: 'Sim, Excluir',
+        cancelButtonText: 'Cancelar',
+        reverseButtons: true
+    }).then((result) => {
+        if (result.isConfirmed) {
+            const form = document.getElementById('formExcluirExame');
+            form.action = `/clientes/excluir-exame/${clienteId}/${exameId}`;
+            form.submit();
+        }
+    });
+}
+</script>
+
+<%- include('partials/footer') %>

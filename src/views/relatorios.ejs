@@ -1,0 +1,53 @@
+<%- include('partials/header-relatorio') %> <div style="max-width: 800px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+    
+    <div style="text-align: center; border-bottom: 2px solid #3b82f6; padding-bottom: 20px; margin-bottom: 30px;">
+        <h1 style="margin: 0; text-transform: uppercase;">Aura Clinic - Sistema de Gestão</h1>
+        <p style="margin: 5px 0; color: #64748b;">Relatório de Evolução Clínica e Diagnóstico por Imagem</p>
+    </div>
+
+    <div style="display: flex; gap: 20px; margin-bottom: 30px; align-items: center;">
+        <img src="/uploads/clientes/<%= cliente.foto || 'default-avatar.png' %>" 
+             style="width: 100px; height: 100px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd;">
+        <div>
+            <h2 style="margin: 0; text-transform: uppercase;"><%= cliente.nome %></h2>
+            <p style="margin: 5px 0;"><strong>CPF:</strong> <%= cliente.cpf %> | <strong>Nascimento:</strong> <%= cliente.data_nascimento %></p>
+            <p style="margin: 5px 0;"><strong>Telefone:</strong> <%= cliente.telefone %></p>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 30px;">
+        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Histórico Clínico Detalhado</h3>
+        <div style="padding: 15px; background: #f8fafc; border-radius: 4px; line-height: 1.6; white-space: pre-line;">
+            <%= cliente.historico || 'Nenhum registro encontrado.' %>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 40px;">
+        <h3 style="border-bottom: 1px solid #eee; padding-bottom: 5px;">Anexos (Radiografias e Procedimentos)</h3>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap; margin-top: 15px;">
+            <% if (exames && exames.length > 0) { %>
+                <% exames.forEach(exame => { %>
+                    <div style="border: 1px solid #ddd; padding: 10px; border-radius: 4px; text-align: center; background: #fff;">
+                        <img src="/uploads/clientes/<%= exame.arquivo %>" 
+                             alt="Exame/RX" 
+                             style="max-width: 250px; max-height: 250px; display: block; margin-bottom: 5px;">
+                        <span style="font-size: 11px; color: #64748b;">Exame/Foto</span>
+                    </div>
+                <% }) %>
+            <% } else { %>
+                <p style="color: #94a3b8; font-style: italic; font-size: 14px;">Nenhum anexo encontrado para este paciente.</p>
+            <% } %>
+        </div>
+    </div>
+
+    <div style="margin-top: 80px; text-align: center;">
+        <div style="border-top: 1px solid #333; width: 300px; margin: 0 auto;"></div>
+        <p style="font-size: 12px; margin-top: 5px;">Assinatura do Profissional Responsável</p>
+    </div>
+
+</div>
+
+<script>
+    // Opcional: Abre a caixa de impressão automaticamente ao carregar
+    // window.print();
+</script>

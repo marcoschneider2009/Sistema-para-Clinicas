@@ -1,0 +1,83 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="content-wrapper">
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1><i class="fas fa-calendar-check"></i> Gestão de Agendamentos</h1>
+            <p>Lista de atendimentos marcados no sistema.</p>
+        </div>
+        <button class="btn-salvar" onclick="abrirModalCadastro()" style="background: #1e293b; color: white; padding: 12px 24px; border-radius: 6px; cursor: pointer; border: none; font-weight: bold;">
+            <i class="fas fa-plus"></i> Novo Agendamento
+        </button>
+    </div>
+
+    <table class="aura-table">
+        <thead>
+            <tr>
+                <th>PACIENTE</th>
+                <th>DATA</th>
+                <th>HORA</th>
+                <th>PROCEDIMENTO</th>
+                <th>STATUS</th>
+                <th style="text-align: center;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (agendamentos && agendamentos.length > 0) { %>
+                <% agendamentos.forEach(agendamento => { %>
+                    <tr>
+                        <td><strong><%= agendamento.paciente_nome %></strong></td>
+                        <td style="font-weight: bold; color: #3b82f6;"><%= agendamento.data_br || agendamento.data %></td>
+                        <td><%= agendamento.hora %></td>
+                        <td><%= agendamento.procedimento %></td>
+                        <td>
+                            <% 
+                                let badgeColor = "#3b82f6";
+                                if(agendamento.status === 'Confirmado') badgeColor = "#10b981";
+                                if(agendamento.status === 'Pendente') badgeColor = "#f59e0b";
+                            %>
+                            <span style="background: <%= badgeColor %>; color: white; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold;">
+                                <%= agendamento.status %>
+                            </span>
+                        </td>
+                        <td style="text-align: center;">
+                            <a href="/agendamentos/editar/<%= agendamento.id %>" style="color: #3b82f6; margin-right: 15px;"><i class="fas fa-edit"></i></a>
+                            <a href="javascript:void(0)" onclick="abrirModalExcluir('<%= agendamento.id %>', '<%= agendamento.paciente_nome %>')" style="color: #ef4444;"><i class="fas fa-trash"></i></a>
+                        </td>
+                    </tr>
+                <% }) %>
+            <% } else { %>
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 50px; color: #94a3b8;">Nenhum agendamento encontrado.</td>
+                </tr>
+            <% } %>
+        </tbody>
+    </table>
+</main>
+
+<div id="modalExcluir" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div style="background: white; padding: 30px; border-radius: 12px; width: 400px; text-align: center;">
+        <i class="fas fa-exclamation-triangle" style="font-size: 40px; color: #ef4444; margin-bottom: 15px;"></i>
+        <h3 style="margin: 0 0 10px;">Confirmar Exclusão</h3>
+        <p id="textoConfirmacao" style="margin: 0; color: #64748b;"></p>
+        <form id="formExcluir" method="POST">
+            <div style="display: flex; gap: 10px; margin-top: 25px;">
+                <button type="submit" style="flex: 1; background: #ef4444; color: white; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold;">Sim, Excluir</button>
+                <button type="button" onclick="fecharModalExcluir()" style="flex: 1; background: #e2e8f0; padding: 12px; border: none; border-radius: 6px; cursor: pointer;">Cancelar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function abrirModalExcluir(id, nome) {
+        document.getElementById('modalExcluir').style.display = 'flex';
+        document.getElementById('textoConfirmacao').innerHTML = `Deseja excluir o agendamento de <strong>${nome}</strong>?`;
+        document.getElementById('formExcluir').action = `/agendamentos/deletar/${id}`;
+    }
+    function fecharModalExcluir() { document.getElementById('modalExcluir').style.display = 'none'; }
+    function abrirModalCadastro() { window.location.href = '/agendamentos/novo'; }
+</script>
+
+<%- include('partials/footer') %>

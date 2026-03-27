@@ -1,0 +1,159 @@
+<%- include('partials/header') %>
+<%- include('partials/sidebar') %>
+
+<main class="content-wrapper" style="padding: 20px; background: #f0f2f5; min-height: 100vh; font-family: 'Segoe UI', sans-serif;">
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+        <div>
+            <h1 style="color: #3d4451; margin: 0; font-size: 26px; font-weight: 800;">Aura Financeiro</h1>
+            <p style="color: #64748b; margin: 5px 0 0;">Gestão de Recebimentos e Fluxo de Caixa</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalNovoLancamento" style="background: #3b82f6; border: none; border-radius: 8px; padding: 10px 20px; font-weight: 600;">
+            <i class="fas fa-plus" style="margin-right: 5px;"></i> Novo Lançamento
+        </button>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 30px;">
+        <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 5px solid #3b82f6;">
+            <span style="color: #64748b; font-size: 13px; font-weight: 700; text-transform: uppercase;">A Receber</span>
+            <h2 style="margin: 10px 0 0; color: #1e293b; font-size: 28px; font-weight: 800;">R$ <%= stats.totalAReceber %></h2>
+        </div>
+        <div style="background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); border-left: 5px solid #10b981;">
+            <span style="color: #64748b; font-size: 13px; font-weight: 700; text-transform: uppercase;">Recebido (Mês)</span>
+            <h2 style="margin: 10px 0 0; color: #10b981; font-size: 28px; font-weight: 800;">R$ <%= stats.totalRecebidoMes %></h2>
+        </div>
+    </div>
+
+    <div style="background: white; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); overflow: hidden; border: 1px solid #e2e8f0;">
+        <table class="table table-hover" style="margin-bottom: 0;">
+            <thead style="background: #3d4451; color: white; font-size: 12px; text-transform: uppercase;">
+                <tr>
+                    <th style="padding: 15px;">Data</th>
+                    <th>Cliente</th>
+                    <th>Procedimento</th>
+                    <th>Valor</th>
+                    <th>Forma</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% lancamentos.forEach(lança => { 
+                    let corStatus = (lança.status === 'Pago') ? '#10b981' : (lança.status === 'Pendente' ? '#f59e0b' : '#3b82f6');
+                %>
+                <tr style="vertical-align: middle;">
+                    <td style="padding: 15px;"><%= lança.data_realizada_br %></td>
+                    <td style="font-weight: 700;"><%= lança.cliente_nome %></td>
+                    <td><%= lança.procedimento %></td>
+                    <td style="font-weight: 800;">R$ <%= lança.valor_total_br %></td>
+                    <td><%= lança.forma_pagamento %></td>
+                    <td>
+                        <span style="background: <%= corStatus %>; color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700;">
+                            <%= lança.status %>
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-secondary"><i class="fas fa-ellipsis-v"></i></button>
+                    </td>
+                </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </div>
+</main>
+
+<div class="modal fade" id="modalNovoLancamento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content" style="border-radius: 15px; border: none;">
+            <form action="/faturamento/novo" method="POST">
+                <div class="modal-header" style="background: #3d4451; color: white; border-radius: 15px 15px 0 0;">
+                    <h5 class="modal-title font-weight-bold">Novo Lançamento Financeiro</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body" style="padding: 25px;">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nome do Cliente</label>
+                            <input type="text" name="cliente_nome" class="form-control" required placeholder="Ex: Adriano Silveira">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Procedimento</label>
+                            <input type="text" name="procedimento" class="form-control" required placeholder="Ex: Limpeza, Canal...">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Data da Realização</label>
+                            <input type="date" name="data_realizada" class="form-control" required value="<%= new Date().toISOString().split('T')[0] %>">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Valor Total (R$)</label>
+                            <input type="number" step="0.01" id="inputValor" name="valor_total" class="form-control" required placeholder="0,00">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Forma de Pagamento</label>
+                            <select name="forma_pagamento" id="selectForma" class="form-control" required>
+                                <option value="PIX">PIX</option>
+                                <option value="Cartão de Crédito">Cartão de Crédito</option>
+                                <option value="Dinheiro">Dinheiro</option>
+                            </select>
+                        </div>
+                        
+                        <div id="areaParcelamento" class="col-12 mt-3 p-3" style="background: #f8fafc; border-radius: 10px; display: none;">
+                            <div class="row align-items: center;">
+                                <div class="col-md-4">
+                                    <label class="form-label">Parcelar em:</label>
+                                    <select id="selectParcelas" name="num_parcelas" class="form-control">
+                                        <% for(let i=1; i<=12; i++) { %>
+                                            <option value="<%= i %>"><%= i %>x</option>
+                                        <% } %>
+                                    </select>
+                                </div>
+                                <div class="col-md-8">
+                                    <div style="margin-top: 32px; font-weight: 700; color: #3b82f6;">
+                                        Resultado: <span id="resParcela">R$ 0,00</span> por mês
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label">Status Inicial</label>
+                            <select name="status" class="form-control" required>
+                                <option value="Pago">Pago</option>
+                                <option value="Pendente">Pendente</option>
+                                <option value="Parcelado">Parcelado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer" style="background: #f8fafc; border-radius: 0 0 15px 15px;">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 30px;">Salvar Lançamento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    const selectForma = document.getElementById('selectForma');
+    const areaParcelamento = document.getElementById('areaParcelamento');
+    const inputValor = document.getElementById('inputValor');
+    const selectParcelas = document.getElementById('selectParcelas');
+    const resParcela = document.getElementById('resParcela');
+
+    function calcularParcela() {
+        const total = parseFloat(inputValor.value) || 0;
+        const vezes = parseInt(selectParcelas.value);
+        const valorParcela = total / vezes;
+        resParcela.innerText = valorParcela.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    selectForma.addEventListener('change', () => {
+        areaParcelamento.style.display = (selectForma.value === 'Cartão de Crédito') ? 'block' : 'none';
+    });
+
+    inputValor.addEventListener('input', calcularParcela);
+    selectParcelas.addEventListener('change', calcularParcela);
+</script>
+
+<%- include('partials/footer') %>
